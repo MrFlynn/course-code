@@ -90,3 +90,6 @@ ENV/
 
 # Because Macs
 .DS_STORE
+
+# Rust
+*/target
