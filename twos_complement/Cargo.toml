@@ -1,0 +1,8 @@
+[package]
+name = "convert"
+version = "0.1.0"
+authors = ["Nick Pleatsikas <nick@pleatsikas.me>"]
+publish = false
+
+[dependencies]
+getopts = "0.2"
