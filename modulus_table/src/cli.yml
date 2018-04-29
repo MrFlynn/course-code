@@ -1,0 +1,19 @@
+name: modulus_table
+version: "0.1.0"
+author: Nick Pleatsikas <nick@pleatsikas.me>
+about: Generates modular arithmetic tables (multiplicative and inverse) for arbitrary bases
+args:
+  - base:
+      short: b
+      long: base
+      multiple: false
+      takes_value: true
+      help: Base number for calculating table
+  - csv:
+      short: c
+      long: csv
+      multiple: false
+      takes_value: false
+      help: Output comma separate value file for each table
+      requires:
+        - base

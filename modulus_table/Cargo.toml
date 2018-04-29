@@ -1,0 +1,11 @@
+[package]
+name = "modulus_table"
+version = "0.1.0"
+authors = ["MrFlynn <nick@pleatsikas.me>"]
+
+[dependencies]
+colored = "1.6"
+
+[dependencies.clap]
+version = "2.31.2"
+features = ["yaml"]
