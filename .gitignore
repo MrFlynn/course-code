@@ -93,3 +93,6 @@ ENV/
 
 # Rust
 */target
+
+# Vim
+*.swp
