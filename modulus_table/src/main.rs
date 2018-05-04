@@ -65,7 +65,7 @@ fn print_multiplication_table(table: &Vec<Vec<i32>>) {
     // Print all subsequent rows of the multiplication table.
     for (i, row) in table.iter().enumerate() {
         let row_str: String = vec_to_string(row.to_vec(), " ".to_string());
-        println!("{}|{}", i.to_string().bold(), row_str);
+        println!("{}|{}", (i + 1).to_string().bold(), row_str);
     }
 }
 
