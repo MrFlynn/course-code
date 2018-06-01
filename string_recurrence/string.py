@@ -7,6 +7,7 @@
 import itertools
 from typing import Callable
 
+
 def generate_tuples_of_size(strings: list, size: int, func: Callable) -> list:
     list_of_tuples = []
 
@@ -18,13 +19,20 @@ def generate_tuples_of_size(strings: list, size: int, func: Callable) -> list:
 
     return list_of_tuples
 
+
 def build_strings_of_size(strings: list, size: int) -> list:
     all_strings = []
 
-    all_strings.extend(generate_tuples_of_size(strings, size, itertools.combinations_with_replacement))
-    all_strings.extend(generate_tuples_of_size(strings, size, itertools.permutations))
+    all_strings.extend(generate_tuples_of_size(strings,
+                                               size,
+                                               itertools
+                                               .combinations_with_replacement))
+    all_strings.extend(generate_tuples_of_size(strings,
+                                               size,
+                                               itertools.permutations))
 
     return list(set([''.join(i) for i in all_strings]))
+
 
 def main():
     size = int(input('Strings of size='))
@@ -33,6 +41,7 @@ def main():
     strings = build_strings_of_size(base_strings, size)
     print(f'Number of strings: {len(strings)}')
     print(strings)
+
 
 if __name__ == '__main__':
     main()
