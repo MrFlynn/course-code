@@ -96,3 +96,7 @@ ENV/
 
 # Vim
 *.swp
+
+# Haskell
+*.hi
+*.o
