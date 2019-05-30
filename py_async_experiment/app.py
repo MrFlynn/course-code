@@ -15,7 +15,9 @@ class App:
         self.threads_info = threads_info
 
         self.loop = asyncio.get_event_loop()
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+        self.loop.set_default_executor(
+            concurrent.futures.ThreadPoolExecutor(max_workers=2)
+        )
 
         self.workers: Dict[str, Worker] = {}
 
@@ -28,61 +30,48 @@ class App:
             worker = Worker(t, idx)
             self.workers[worker.digest] = worker
 
-    def _worker_sleep_callback(self, task: asyncio.Task):
+    def _sleep_worker(self, digest: str):
+        sleep_time = self.workers[digest].sleep_time
+
+        logging.info(
+            f'Sleeping worker {self.workers[digest].worker_num} for '
+            f'{sleep_time}.'
+        )
+        self.loop.call_later(
+            sleep_time,
+            self._run_worker,
+            digest
+        )
+
+    def _schedule_worker_sleep(self, task: asyncio.Task):
         digest = None
         try:
             digest = task.result()
             if not digest in self.workers:
                 raise KeyError
 
-            self._add_worker_to_pool(digest)
+            self._sleep_worker(digest)
         except KeyError:
             logging.error(f'Could not find worker {digest}!')
 
-    def _sleep_worker(self, digest: str, duration: int):
-        logging.info(f'Worker {digest} sleeping for {duration}s.')
-
-        task = self.loop.create_task(asyncio.sleep(duration, result=digest))
-        task.add_done_callback(
-            functools.partial(self._worker_sleep_callback)
-        )
-
-    def _add_worker_to_pool(self, digest: str):
+    def _run_worker(self, digest: str):
         worker = self.workers[digest]
 
-        try:
-            future = self.executor.submit(worker.run)
-        except RuntimeError as e:
-            if 'shutdown' in e.args[0]:
-                return
-            else:
-                logging.fatal(e.with_traceback)
-                raise RuntimeError
-
-        done, _ = concurrent.futures.wait(
-            [future], return_when=concurrent.futures.FIRST_COMPLETED
+        task = self.loop.create_task(worker.run())
+        task.add_done_callback(
+            functools.partial(self._schedule_worker_sleep)
         )
-
-        digest = None
-        try:
-            digest = done.pop().result()
-            if not digest in self.workers:
-                raise KeyError
-
-            self._sleep_worker(digest, self.workers[digest].sleep_time)
-        except KeyError:
-            logging.error(f'Could not find worker {digest}!')
 
     def run(self):
         self._create_workers()
 
         for d in self.workers.keys():
-            self._sleep_worker(d, 1)
+            self._sleep_worker(d)
 
         try:
             self.loop.run_forever()
         finally:
-            self.loop.stop()
+            self.loop.close()
             logging.info('Exiting...')
 
     async def _shutdown(self):
@@ -92,7 +81,5 @@ class App:
 
         for t in collected_tasks:
             t.cancel()
-
-        self.executor.shutdown(wait=True)
 
         self.loop.stop()

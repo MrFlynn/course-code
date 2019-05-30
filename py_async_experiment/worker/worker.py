@@ -10,7 +10,7 @@ class Worker:
         self.sleep_time = sleep_time
         self.worker_num = worker_num
 
-    def run(self) -> str:
+    async def run(self) -> str:
         logging.info(f'Worker {self.worker_num} running.')
         time.sleep(self.sleep_time)
         logging.info(f'Worker {self.worker_num} exiting.')
