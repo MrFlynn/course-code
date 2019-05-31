@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 class App:
     def __init__(self, threads_info: List[int]):
         self.threads_info = threads_info
+        self.lock = asyncio.Lock()
 
         self.loop = asyncio.get_event_loop()
         self.loop.set_default_executor(
@@ -27,7 +28,7 @@ class App:
 
     def _create_workers(self):
         for idx, t in enumerate(self.threads_info):
-            worker = Worker(t, idx)
+            worker = Worker(t, idx, self.lock)
             self.workers[worker.digest] = worker
 
     def _sleep_worker(self, digest: str):
