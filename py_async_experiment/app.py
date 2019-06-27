@@ -22,8 +22,21 @@ class App:
 
         self.workers: Dict[str, Worker] = {}
 
+        self._add_shutdown_handler()
+
+    def _add_shutdown_handler(self):
+        async def shutdown():
+            collected_tasks = [
+                t for t in asyncio.all_tasks() if t is not asyncio.current_task()
+            ]
+
+            for t in collected_tasks:
+                t.cancel()
+
+            self.loop.stop()
+
         self.loop.add_signal_handler(
-            SIGINT, lambda: asyncio.create_task(self._shutdown())
+            SIGINT, lambda: asyncio.create_task(shutdown())
         )
 
     def _create_workers(self):
@@ -75,12 +88,3 @@ class App:
             self.loop.close()
             logging.info('Exiting...')
 
-    async def _shutdown(self):
-        collected_tasks = [
-            t for t in asyncio.all_tasks() if t is not asyncio.current_task()
-        ]
-
-        for t in collected_tasks:
-            t.cancel()
-
-        self.loop.stop()
