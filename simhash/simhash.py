@@ -9,9 +9,9 @@ class SimHash:
     def __init__(self, fingerprint_size: int = 8):
         self._fsize = fingerprint_size
 
-    @staticmethod
-    def _words_to_vector(words: str) -> List[int]:
-        return [sum([ord(c) for c in w]) % 256 for w in words.split()]
+    def _words_to_vector(self, words: str) -> List[int]:
+        mod = 1 << self._fsize
+        return [sum([ord(c) for c in w]) % mod for w in words.split()]
 
     def _column_weights(self, words: List[int]) -> List[int]:
         weights = []
