@@ -38,6 +38,10 @@ class SimHash:
 
         return fingerprint
 
+    @property
+    def bits(self):
+        return self._fsize
+
     def hash(self, string: str) -> int:
         vec = self._words_to_vector(string)
         weights = self._column_weights(vec)
@@ -50,8 +54,9 @@ def main():
     hasher = SimHash()
     fprint = hasher.hash(words)
 
+    fmt_str = f"0{hasher.bits}b"
     print(
-        f"Fingerprint of \"{words}\" is: {fprint} ({format(fprint, '08b')})"
+        f"Fingerprint of \"{words}\" is: {fprint} ({format(fprint, fmt_str)})"
     )
 
 
